@@ -4,10 +4,12 @@ import dropRepeats from 'xstream/extra/dropRepeats';
 
 export type MainFn<Sources, Sinks> = (sources: Sources) => Sinks;
 export type Reducer = (state: any) => any;
-export type Selector = (state: any) => any;
+export type Selector<State, Out> = (state: State) => Out;
 export type Aggregator = (...streams: Array<Stream<any>>) => Stream<any>;
 
-export function pick(selector: Selector | string) {
+export function pick<State, Out>(selector: Selector<State, Out>): (streams: Stream<Array<State>>) => Stream<Array<Out>>;
+export function pick<State, Out>(selector: string): (streams: Stream<Array<any>>) => Stream<Array<any>>;
+export function pick(selector: Selector<any, any> | string) {
   if (typeof selector === 'string') {
     return function pickWithString(sinksArray$: Stream<Array<any>>): Stream<Array<any>> {
       return sinksArray$.map(sinksArray => sinksArray.map(sinks => sinks[selector]));
